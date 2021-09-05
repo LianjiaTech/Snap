@@ -1,0 +1,27 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.project_link {
+  position: fixed;
+  top: 40px;
+  right: 58px;
+}
+
+.center {
+  text-align: center;
+}
+
+.readme {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 25px;
+  border: 1px solid #dfdfdf;
+  border-radius: 4px;
+  color: #2e2e2e;
+}

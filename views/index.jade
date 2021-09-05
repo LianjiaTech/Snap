@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}, Today PV: #{today_num}, Total PV: #{total_num}
+
+  a.project_link(href='#{project_link}') Fork
+
+  br
+  br
+  br
+
+  article.readme
+    != markdown(readme)
+
+  p.center Copyright &copy; #{year} 基础架构部出品

@@ -1,0 +1,29 @@
+{
+  "name": "ke-snap",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www 1>> public/logs/snap.log 2>&1",
+    "node-start": "node ./bin/www",
+    "node-debug": "DEBUG=express:* node ./bin/www",
+    "debug": "pm2 start npm -i 0 --name 'KeSnap' --watch --ignore-watch='public/media' -- run node-debug",
+    "deploy": "pm2 start npm -i 0 --name 'KeSnap' -- run start"
+  },
+  "dependencies": {
+    "compressing": "^1.5.1",
+    "cookie-parser": "^1.4.5",
+    "dayjs": "^1.10.6",
+    "debug": "^4.3.2",
+    "express": "^4.17.1",
+    "http-errors": "^1.8.0",
+    "jade": "^1.11.0",
+    "marked": "^2.1.3",
+    "md5": "^2.3.0",
+    "merge-img": "^2.1.3",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "pm2": "^5.1.0",
+    "puppeteer": "^10.2.0",
+    "shortuuid": "^0.1.0"
+  }
+}

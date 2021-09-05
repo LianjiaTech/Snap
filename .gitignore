@@ -1,0 +1,13 @@
+# Mac
+.DS_Store
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+
+# Snapshot
+public/logs/*.log
+public/media/
+local_constant.js
