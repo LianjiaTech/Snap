@@ -1,13 +1,13 @@
 // MySQL
 var mysql = require('mysql');
 
-var pool = constant.DATABASE ? mysql.createPool({
-  connectionLimit: constant.DATABASE.connectionLimit,
-  host: constant.DATABASE.host,
-  port: constant.DATABASE.port,
-  user: constant.DATABASE.user,
-  password: constant.DATABASE.password,
-  database: constant.DATABASE.database,
+var pool = global.constant.DATABASE ? mysql.createPool({
+  connectionLimit: global.constant.DATABASE.connectionLimit,
+  host: global.constant.DATABASE.host,
+  port: global.constant.DATABASE.port,
+  user: global.constant.DATABASE.user,
+  password: global.constant.DATABASE.password,
+  database: global.constant.DATABASE.database,
 }) : null;
 
 // pool.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
