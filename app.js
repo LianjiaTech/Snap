@@ -3,7 +3,6 @@ var path = require('path');
 
 var createError = require('http-errors');
 var express = require('express');
-var puppeteer = require('puppeteer');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
@@ -16,6 +15,7 @@ var lib = require('./utils/lib');
 global.constant = require('./conf/constant');
 global.query = require('./utils/db');
 global.sql = require('./utils/sql');
+global.ws = require('./utils/ws');
 global.errno = require('./utils/error/errno');
 
 global.BASE_DIR = __dirname;
@@ -26,14 +26,14 @@ var responseData = require('./middleware/responseData');
 var app = express();
 
 // view engine setup
-app.set('views', path.join(BASE_DIR, 'views'));
+app.set('views', path.join(global.BASE_DIR, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json({limit: constant.CLIENT_MAX_BODY_SIZE}));
-app.use(express.urlencoded({limit: constant.CLIENT_MAX_BODY_SIZE, extended: false}));
+app.use(express.json({limit: global.constant.CLIENT_MAX_BODY_SIZE}));
+app.use(express.urlencoded({limit: global.constant.CLIENT_MAX_BODY_SIZE, extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(BASE_DIR, constant.STATIC_BASE_DIRNAME)));
+app.use(express.static(path.join(global.BASE_DIR, global.constant.STATIC_BASE_DIRNAME)));
 
 app.use(requestData);
 
@@ -67,19 +67,17 @@ process.on('unhandledRejection', (reason, p) => {
 
 // 存储 browserWSEndpoint 列表
 global.BROWSER_WSENDPOINT_LIST = [];
+global.BROWSER_WSENDPOINT_REINITIALIZE_FLAG = false;
 
 (async () => {
-  for (var i = 0; i < constant.MAX_BROWSER_WSENDPOINT_NUM; i++) {
-    var browser = await puppeteer.launch(constant.PUPPETEER_LAUNCH_OPTIONS);
-    browserWSEndpoint = await browser.wsEndpoint();
-    BROWSER_WSENDPOINT_LIST[i] = browserWSEndpoint;
-  }
-  console.log('>>> BROWSER_WSENDPOINT_LIST: ', BROWSER_WSENDPOINT_LIST);
+  await global.ws.initBrowserWSEndpointList();
+  console.log('>>> BROWSER_WSENDPOINT_LIST: ', global.BROWSER_WSENDPOINT_LIST);
 })();
 
 // Check dir exist or not
-if (!lib.fsExistsSync(constant.STATIC_BASE_DIRNAME + '/' + constant.STATIC_MEDIA_DIRNAME)) {
-  fs.mkdir(constant.STATIC_BASE_DIRNAME + '/' + constant.STATIC_MEDIA_DIRNAME, function () {});
+if (!lib.fsExistsSync(global.constant.STATIC_BASE_DIRNAME + '/' + global.constant.STATIC_MEDIA_DIRNAME)) {
+  fs.mkdir(global.constant.STATIC_BASE_DIRNAME + '/' + global.constant.STATIC_MEDIA_DIRNAME, function () {
+  });
 }
 
 module.exports = app;

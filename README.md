@@ -33,20 +33,21 @@
 
     | 属性 | 类型 | 默认值 | 必填 | 说明 |  
     | ---- | ---- | ---- | ---- | ---- |
-    | src/source |  |  | 否 | 调用方 标识 |
+    | src / source |  |  | 否 | 调用方 标识 |
     | callback |  |  | 否 | JSONP 回调函数，不传为非 JSONP 请求 |
     | cache |  | 0 | 否 | 是否启用缓存，1是0否 |
     | type |  | data | 否 | 返回类型，data文件url链接 |
     | resheaders |  |  | 否 | Response Headers，当 type == "data" 时生效 |
     | url |  |  | 是 | urls/url必有其一，待截图页面链接，GET请求需进行 urlencode |
     | name |  |  | 否 | 截图名称，当 type == "data" 时生效 |
-    | c |  |  | 否 | 待截图页面COOKIES，[{"name": "name", "value": "value", "domain": "domain"}]，GET请求需进行 JSON.stringfy 和 urlencode |
+    | c / cookies |  |  | 否 | 待截图页面COOKIES，[{"name": "name", "value": "value", "domain": "domain"}]，GET请求需进行 JSON.stringfy 和 urlencode |
     | urls |  |  | 是 | urls/url必有其一，待截图页面链接，GET请求需进行 JSON.stringfy 和 urlencode |
     |  - urls.url |  |  | 是 | 待截图页面链接 |
     |  - urls.name |  |  | 否 | 截图名称 |
     |  - urls.cookies |  |  | 否 | 待截图页面COOKIES |
     | s |  |  | 否 | 待截图页面元素，GET请求需进行 urlencode |
     | m |  | 0 | 否 | 是否为移动端，1是0否，为移动端时，模拟器为 iPhone 6 |
+    | device |  | iPhone 6 | 否 | 移动端模拟器，默认 iPhone 6，当 m == 1 时生效，模拟器列表参考：https://github.com/puppeteer/puppeteer/blob/main/src/common/DeviceDescriptors.ts |
     | f |  | 1 | 否 | 是否全屏截屏，1是0否，为1时全屏高度貌似为html元素的高度 |
     | fs |  |  | 否 | 获取全屏宽高页面元素，默认 document.body.scrollWidth/document.body.scrollHeight |
     | x |  | 0 | 否 | 截屏左上角x坐标 |
@@ -56,13 +57,20 @@
     | t |  | 500 | 否 | 预留页面渲染时间，单位为毫秒(ms) |
     | ts |  | 0 | 否 | 截图当前时间戳 |
     | scale |  | 1 | 否 | 页面的缩放（可以认为是 dpr） |
+    | pre_actions |  |  | 否 | 开始截图前，页面操作，GET请求需进行 JSON.stringfy 和 urlencode |
+    |  - action.event |  |  | 否 | 开始截图前，页面操作类型，支持类型：init(初始化)/click(点击)/tap(移动端点击)/back(返回)/wait(停留)/drag(拖拽) |
+    |  - action.selector |  |  | 否 | 开始截图前，页面操作元素，->click |
+    |  - action.xy |  |  | 否 | 开始截图前，页面拖拽坐标，[[100, 100], [100, 10], [200, 10], ...]，->click/drag |
+    |  - action.time |  |  | 否 | 开始截图前，页面操作后，预留页面渲染时间，单位为毫秒(ms) |
     | actions |  |  | 否 | 页面操作，GET请求需进行 JSON.stringfy 和 urlencode |
-    |  - actions.event |  |  | 否 | 页面操作类型，支持类型：init(初始化)/click(点击)/back(返回)/wait(停留) |
-    |  - actions.selector |  |  | 否 | 页面操作元素 |
-    |  - actions.time |  |  | 否 | 页面操作后，预留页面渲染时间，单位为毫秒(ms) |
-    |  - actions.name |  |  | 否 | 页面操作后，截图名称 |
-    |  - actions.snap |  |  | 否 | 页面操作后，是否截图，1是0否，默认1 |
-    |  - actions.html |  |  | 否 | 页面操作后，是否保存页面，1是0否，默认0 |
+    |  - action.event |  |  | 否 | 页面操作类型，支持类型：init(初始化)/click(点击)/tap(移动端点击)/back(返回)/wait(停留)/drag(拖拽) |
+    |  - action.selector |  |  | 否 | 页面操作元素，->click |
+    |  - action.xy |  |  | 否 | 页面拖拽坐标，[[100, 100], [100, 10], [200, 10], ...]，->click/drag |
+    |  - action.time |  |  | 否 | 页面操作后，预留页面渲染时间，单位为毫秒(ms) |
+    |  - action.s |  |  | 否 | 页面操作后，截图元素 |
+    |  - action.name |  |  | 否 | 页面操作后，截图名称 |
+    |  - action.snap |  |  | 否 | 页面操作后，是否截图，1是0否，默认1 |
+    |  - action.html |  |  | 否 | 页面操作后，是否保存页面，1是0否，默认0 |
 
 * 调用
 
@@ -75,8 +83,18 @@
 ## 注意事项
 
 * 全屏截屏
+    ```javascript
+    page.screenshot({
+      fullPage: true
+    });
+    ```
   * 全屏高度貌似为html元素的高度
   * 元素勿使用 `height: 100%` 之类的属性
+
+* 选择器截图
+  * 当触发 ``page.setViewport(viewport)`` 时
+  * 页面重绘可能会导致页面错乱
+  * 尽量最初就设置 viewport 为合适的值，以防触发重绘
 
 ## TODO
 
