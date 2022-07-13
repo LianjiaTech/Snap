@@ -210,6 +210,9 @@ async function prepare_exec_snapshot(page, program, url, idx) {
     waitUtil: 'networkidle0'
   });
 
+  let performance = await page.evaluate(()=>JSON.stringify(window.performance.getEntries()));
+  fs.writeFileSync(path.join(program.store_path, 'performance.json'), performance);
+
   // TODO: Make Exec Action Be A Function
   // PreActions
   if (pre_actions.length > 0) {
@@ -395,6 +398,7 @@ async function exec_snapshot(program, url, idx) {
     await prepare_exec_snapshot(page, program, url, idx);
   } catch (e) {
     console.log('>>> Snap Error: ', e.message);
+    fs.writeFileSync(path.join(program.store_path, 'error.html'), await page.content());
   }
 
   if (global.constant.PAGE_CLOSE_AFTER_SNAPSHOT) {
