@@ -9,6 +9,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var snapRouter = require('./routes/snap');
+var pageRouter = require('./routes/page');
 
 var lib = require('./utils/lib');
 
@@ -41,6 +42,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/snap', snapRouter);
 app.use('/api', snapRouter);
+app.use('/page', pageRouter);
 
 app.use(responseData);
 
