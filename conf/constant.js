@@ -80,6 +80,9 @@ module.exports = Object.assign({}, {
   CLIENT_MAX_BODY_SIZE: '100kb',
   // 开发（Develop）
   PAGE_CLOSE_AFTER_SNAPSHOT: true,
+  // Log
+  LOG_ERROR_ENABLED: true,
+  LOG_PERFORMANCE_ENABLED: true,
 
   PAGE_CHECK_TIMEOUT: 10 * 1000,
   WHITE_SCREEN_THRESHOLD: 1,
