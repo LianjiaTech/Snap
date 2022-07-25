@@ -81,6 +81,6 @@ module.exports = Object.assign({}, {
   // 开发（Develop）
   PAGE_CLOSE_AFTER_SNAPSHOT: true,
 
-  PAGE_CHECK_TIMEOUT: 10*1000,
+  PAGE_CHECK_TIMEOUT: 10 * 1000,
   WHITE_SCREEN_THRESHOLD: 1,
 }, local_constant);
