@@ -7,13 +7,34 @@ try {
 // Puppeteer Launch Args
 PUPPETEER_LAUNCH_SINGLE_PROCESS_ARG = '--single-process';
 PUPPETEER_LAUNCH_ARGS = local_constant.PUPPETEER_LAUNCH_ARGS || [
-  '--disable-gpu',
-  '--disable-extensions',  // 扩展程序
-  '--disable-dev-shm-usage',
-  '--disable-setuid-sandbox',
-  '--no-first-run',
-  '--no-sandbox',  // 沙箱功能
-  '--no-zygote',
+  '--disable-gpu', // 禁用 GPU 硬件加速。 如果软件渲染器没有到位，那么 GPU 进程将不会启动。
+  '--disable-background-networking', // 禁用几个在后台运行网络请求的子系统。 这是在进行网络性能测试时使用，以避免测量中的噪声。
+  '--disable-breakpad', // 禁用崩溃报告。
+  '--disable-component-update', // 禁用组件更新？
+  '--disable-dev-shm-usage', // /dev/shm 分区在某些 VM 环境中太小，导致 Chrome 失败或崩溃（参见 http://crbug.com/715363）。 使用此标志来解决此问题（将始终使用临时目录来创建匿名共享内存文件）。
+  '--disable-domain-reliability', // 禁用域可靠性监控。
+  '--disable-extensions', // 禁用扩展
+  '--disable-features=AudioServiceOutOfProcess', // 禁用音频沙盒功能
+  '--disable-hang-monitor', // 禁止在渲染器进程中挂起监视器对话框。(选项卡允许直接关闭)
+  '--disable-ipc-flooding-protection', // 禁用 IPC 泛洪保护。 默认情况下已激活。 一些 javascript 函数可用于使用 IPC 淹没浏览器进程。 这种保护限制了它们的使用速率。
+  '--disable-notifications', // 禁用 Web 通知和推送 API。
+  '--disable-popup-blocking', // 禁用弹出窗口阻止。
+  '--disable-print-preview', // 禁用打印预览
+  '--disable-prompt-on-repost', // 禁用 prompt。此开关一般在自动化测试期间使用。
+  // '--disable-renderer-backgrounding', // 禁止后台渲染
+  '--disable-setuid-sandbox', // 禁用 setuid 沙箱（仅限 Linux）
+  '--disable-speech-api', // 禁用 Web Speech API（语音识别和合成）。
+  '--hide-scrollbars', // 从屏幕截图中隐藏滚动条。
+  '--metrics-recording-only', // 启用指标记录，但禁用报告。
+  '--mute-audio', // 静音音频
+  '--no-default-browser-check', // 禁用默认浏览器检查。
+  '--no-first-run', // 跳过首次运行任务
+  '--no-pings', // 不发送超链接审核 ping
+  '--no-sandbox', // 禁用沙箱
+  '--no-zygote', // 禁止使用 zygote 进程来派生子进程。 相反，子进程将被 fork 并直接执行。
+  '--password-store=basic', // 使用基础的密码保存
+  // '--use-gl=swiftshader', // 选择 GPU 进程应使用的 GL 实现。使用 SwiftShader 软件渲染器
+  '--use-mock-keychain', // 使用 mock-keychain 防止提示权限提示
   // '--single-process',
   // '--incognito',  // 无痕模式、隐身模式
 ];

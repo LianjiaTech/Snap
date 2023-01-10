@@ -7,7 +7,9 @@
     "node-start": "node ./bin/www",
     "node-debug": "DEBUG=express:* node ./bin/www",
     "debug": "pm2 start npm -i 0 --name 'KeSnap' --watch --ignore-watch='public/media' -- run node-debug",
-    "deploy": "pm2 start npm -i 0 --name 'KeSnap' -- run start"
+    "deploy": "pm2 start npm -i 0 --name 'KeSnap' -- run start",
+    "reload": "pm2 reload KeSnap",
+    "restart": "pm2 restart KeSnap"
   },
   "dependencies": {
     "compressing": "^1.5.1",

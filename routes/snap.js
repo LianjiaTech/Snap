@@ -132,7 +132,7 @@ async function final_exec_snapshot(program, page, time, final_store_path, select
     for (var j = 0; j * screenWidth < totalWidth; j++) {
       cumWidth += screenWidth;
       console.log(`>>> Screenshot part (${i}, ${j}) - ((${Math.min(cumWidth, totalWidth)} * ${Math.min(cumHeight, totalHeight)}) / (${totalWidth} * ${totalHeight}))`);
-      var screen = await page.screenshot({
+      var options = {
         path: ((totalWidth > screenWidth) || (totalHeight > screenHeight)) ? undefined : final_store_path,  // if only 1 screen is needed with save immediately
         clip: {
           x: x + j * screenWidth,
@@ -145,13 +145,18 @@ async function final_exec_snapshot(program, page, time, final_store_path, select
               ? Math.ceil(screenHeight - (cumHeight - totalHeight))
               : screenHeight
         }
-      });
-      rowScreens.push(screen)
+      };
+      if (program.snapType === 'jpeg') {
+        options.type = program.snapType;
+        options.quality = program.snapQuality;
+      }
+      var screen = await page.screenshot(options);
+      rowScreens.push(screen);
     }
     if (rowScreens.length > 1) {
       mergedRowScreen = await mergeimg(rowScreens, {
         direction: false
-      })
+      });
     } else {
       mergedRowScreen = rowScreens[0];
     }
@@ -355,7 +360,7 @@ async function prepare_exec_snapshot(page, program, url, idx) {
 
       final_path = path.join(program.file_path, action.name || idx.toString());
 
-      final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.png');
+      final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.' + program.snapType);
       await final_exec_snapshot(program, page, time, final_store_path, selector = action.s);
 
       if (action.html === 1) {
@@ -369,7 +374,7 @@ async function prepare_exec_snapshot(page, program, url, idx) {
     } else {
       final_path = program.file_path;
     }
-    final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.png');
+    final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.' + program.snapType);
     await final_exec_snapshot(program, page, time, final_store_path);
   }
 }
@@ -478,13 +483,24 @@ router.all('/shot', async function (req, res, next) {
   if (!lib.isEmpty(req.data.url)) {
     urls = [url];
   }
+  // snap
+  var snapType = req.data.snapType || 'png';
+  if (!['jpeg', 'png'].includes(snapType)) {
+    req.resdata = global.errno.ParamsStatusCode.SNAPTYPE_NOT_SUPPORT;
+    return next();
+  }
+  var snapQuality = parseInt(req.data.snapQuality) || 100;
+  if (snapType == 'jpeg' && (snapQuality < 0 || snapQuality > 100)) {
+    req.resdata = global.errno.ParamsStatusCode.SNAPQUALITY_RANGE_ERROR;
+    return next();
+  }
   // actions
   var pre_actions = lib.jsonParse(req.data.pre_actions) || [];
   var actions = lib.jsonParse(req.data.actions) || [];
   // 文件后缀 - suffix
-  var suffix = urls.length === 1 ? (actions.length > 0 ? 'zip' : 'png') : 'zip';
+  var suffix = urls.length === 1 ? (actions.length > 0 ? 'zip' : snapType) : 'zip';
   // file_name - xxx
-  var file_name = md5(source + callback + urls + JSON.stringify(cookies) + req.data.s + req.data.m + req.data.device + req.data.f + req.data.fs + req.data.x + req.data.y + req.data.w + req.data.h + req.data.ts + req.data.scale + JSON.stringify(pre_actions) + JSON.stringify(actions));
+  var file_name = md5(source + callback + urls + JSON.stringify(cookies) + req.data.s + req.data.m + req.data.device + req.data.f + req.data.fs + req.data.x + req.data.y + req.data.w + req.data.h + req.data.ts + req.data.scale + snapType + snapQuality + JSON.stringify(pre_actions) + JSON.stringify(actions));
 
   // file_path - media/xxx
   var file_path = path.join(global.constant.STATIC_MEDIA_DIRNAME, file_name);
@@ -527,6 +543,8 @@ router.all('/shot', async function (req, res, next) {
     height: req.data.h || 1080,
     time: req.data.t || 500,
     scale: Math.ceil(req.data.scale || global.constant.DEVICE_SCALE_FACTOR),
+    snapType: snapType,
+    snapQuality: snapQuality,
   };
   console.log('>>> Program: ', program);
 

@@ -57,6 +57,8 @@
     | t |  | 500 | 否 | 预留页面渲染时间，单位为毫秒(ms) |
     | ts |  | 0 | 否 | 截图当前时间戳 |
     | scale |  | 1 | 否 | 页面的缩放（可以认为是 dpr） |
+    | snapType |  | png | 否 | 截图图片类型，jpeg/png，默认png |
+    | snapQuality |  | 1 | 否 | 截图图片质量，0-100，默认100，当 snapType == "jpeg" 时生效 |
     | pre_actions |  |  | 否 | 开始截图前，页面操作，GET请求需进行 JSON.stringfy 和 urlencode |
     |  - action.event |  |  | 否 | 开始截图前，页面操作类型，支持类型：init(初始化)/click(点击)/tap(移动端点击)/back(返回)/wait(停留)/drag(拖拽) |
     |  - action.selector |  |  | 否 | 开始截图前，页面操作元素，->click |
