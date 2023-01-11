@@ -358,7 +358,7 @@ async function prepare_exec_snapshot(page, program, url, idx) {
         continue
       }
 
-      final_path = path.join(program.file_path, action.name || idx.toString());
+      final_path = path.join(program.file_path, action.name.toString() || idx.toString());
 
       final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.' + program.snapType);
       await final_exec_snapshot(program, page, time, final_store_path, selector = action.s);
