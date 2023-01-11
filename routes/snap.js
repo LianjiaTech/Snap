@@ -185,7 +185,7 @@ async function prepare_exec_snapshot(page, program, url, idx) {
   var height = parseInt(program.height || 1080);
   var scale = Math.ceil(program.scale || global.constant.DEVICE_SCALE_FACTOR);
   var time = parseInt(program.time || 500);
-  var pre_actions = program.pre_actions || [];
+  var preActions = program.preActions || [];
   var actions = program.actions || [];
 
   var final_path = null;
@@ -222,13 +222,13 @@ async function prepare_exec_snapshot(page, program, url, idx) {
 
   // TODO: Make Exec Action Be A Function
   // PreActions
-  if (pre_actions.length > 0) {
+  if (preActions.length > 0) {
     // 预留一定的渲染时间
     // 若不预留，则下面操作时可能元素还没渲染出来
     // TODO：多个地方预留渲染时间，统一处理优化
     await page.waitForTimeout(time);
 
-    for (const action of pre_actions) {
+    for (const action of preActions) {
       console.log('>>> Snap Page Pre Action: ', action);
       if (action.event === 'click') {
         if (action.selector) {
@@ -495,12 +495,12 @@ router.all('/shot', async function (req, res, next) {
     return next();
   }
   // actions
-  var pre_actions = lib.jsonParse(req.data.pre_actions) || [];
+  var preActions = lib.jsonParse(req.data.preActions || req.data.pre_actions) || [];
   var actions = lib.jsonParse(req.data.actions) || [];
   // 文件后缀 - suffix
   var suffix = urls.length === 1 ? (actions.length > 0 ? 'zip' : snapType) : 'zip';
   // file_name - xxx
-  var file_name = md5(source + callback + urls + JSON.stringify(cookies) + req.data.s + req.data.m + req.data.device + req.data.f + req.data.fs + req.data.x + req.data.y + req.data.w + req.data.h + req.data.ts + req.data.scale + snapType + snapQuality + JSON.stringify(pre_actions) + JSON.stringify(actions));
+  var file_name = md5(source + callback + urls + JSON.stringify(cookies) + req.data.s + req.data.m + req.data.device + req.data.f + req.data.fs + req.data.x + req.data.y + req.data.w + req.data.h + req.data.ts + req.data.scale + snapType + snapQuality + JSON.stringify(preActions) + JSON.stringify(actions));
 
   // file_path - media/xxx
   var file_path = path.join(global.constant.STATIC_MEDIA_DIRNAME, file_name);
@@ -523,7 +523,7 @@ router.all('/shot', async function (req, res, next) {
 
   var program = {
     urls: urls,
-    pre_actions: pre_actions,
+    preActions: preActions,
     actions: actions,
     suffix: suffix,
     file_path: file_path,
