@@ -180,6 +180,67 @@ async function final_exec_snapshot(program, page, time, final_store_path, select
   }
 }
 
+async function exec_action(page, action, time) {
+  if (action.event === 'click') {
+    if (action.selector) {
+      try {
+        await page.click(action.selector);
+      } catch (e) {
+        console.log('>>> Snap Page Click Error: ', e.message);
+        return
+      }
+    } else if (action.xy) {
+      const xys = action.xy;
+      if (xys.length < 1) {
+        return
+      }
+      for (const xy of xys) {
+        await page.mouse.click(...xy);
+      }
+    } else {
+      return
+    }
+  } else if (action.event === 'tap') {
+    if (action.selector) {
+      try {
+        await page.tap(action.selector);
+      } catch (e) {
+        console.log('>>> Snap Page Tap Error: ', e.message);
+        return
+      }
+    } else if (action.xy) {
+      const xys = action.xy;
+      if (xys.length < 1) {
+        return
+      }
+      for (const xy of xys) {
+        await page.mouse.tap(...xy);
+      }
+    } else {
+      return
+    }
+  } else if (action.event === 'back') {
+    await page.goBack();
+  } else if (action.event === 'drag') {
+    const xys = action.xy;
+    if (xys.length <= 1) {
+      return
+    }
+    await page.mouse.move(...xys[0]);
+    await page.mouse.down();
+    for (const xy of xys.slice(1)) {
+      await page.mouse.move(...xy);
+    }
+    await page.mouse.up();
+  } else if (action.event === 'init' || action.event === 'wait') {
+
+  } else {
+    return
+  }
+
+  await page.waitForTimeout(action.time || time);
+}
+
 async function prepare_exec_snapshot(page, program, url, idx) {
   var width = parseInt(program.width || 1920);
   var height = parseInt(program.height || 1080);
@@ -216,11 +277,10 @@ async function prepare_exec_snapshot(page, program, url, idx) {
   });
 
   if (global.constant.LOG_ERROR_ENABLED && idx !== -10000) {
-    let performance = await page.evaluate(()=>JSON.stringify(window.performance.getEntries()));
+    let performance = await page.evaluate(() => JSON.stringify(window.performance.getEntries()));
     fs.writeFileSync(path.join(program.store_path, 'performance.json'), performance);
   }
 
-  // TODO: Make Exec Action Be A Function
   // PreActions
   if (preActions.length > 0) {
     // 预留一定的渲染时间
@@ -230,64 +290,7 @@ async function prepare_exec_snapshot(page, program, url, idx) {
 
     for (const action of preActions) {
       console.log('>>> Snap Page Pre Action: ', action);
-      if (action.event === 'click') {
-        if (action.selector) {
-          try {
-            await page.click(action.selector);
-          } catch (e) {
-            console.log('>>> Snap Page Click Error: ', e.message);
-            continue
-          }
-        } else if (action.xy) {
-          const xys = action.xy;
-          if (xys.length < 1) {
-            continue
-          }
-          for (const xy of xys) {
-            await page.mouse.click(...xy);
-          }
-        } else {
-          continue
-        }
-      } else if (action.event === 'tap') {
-        if (action.selector) {
-          try {
-            await page.tap(action.selector);
-          } catch (e) {
-            console.log('>>> Snap Page Tap Error: ', e.message);
-            continue
-          }
-        } else if (action.xy) {
-          const xys = action.xy;
-          if (xys.length < 1) {
-            continue
-          }
-          for (const xy of xys) {
-            await page.mouse.tap(...xy);
-          }
-        } else {
-          continue
-        }
-      } else if (action.event === 'back') {
-        await page.goBack();
-      } else if (action.event === 'drag') {
-        const xys = action.xy;
-        if (xys.length <= 1) {
-          continue
-        }
-        await page.mouse.move(...xys[0]);
-        await page.mouse.down();
-        for (const xy of xys.slice(1)) {
-          await page.mouse.move(...xy);
-        }
-        await page.mouse.up();
-      } else if (action.event === 'init' || action.event === 'wait') {
-
-      } else {
-        continue
-      }
-
-      await page.waitForTimeout(action.time || time);
+      await exec_action(page, action, time);
     }
   }
 
@@ -295,71 +298,13 @@ async function prepare_exec_snapshot(page, program, url, idx) {
   if (actions.length > 0) {
     for (const action of actions) {
       console.log('>>> Snap Page Action: ', action);
-      if (action.event === 'click') {
-        if (action.selector) {
-          try {
-            await page.click(action.selector);
-          } catch (e) {
-            console.log('>>> Snap Page Click Error: ', e.message);
-            continue
-          }
-        } else if (action.xy) {
-          const xys = action.xy;
-          if (xys.length < 1) {
-            continue
-          }
-          for (const xy of xys) {
-            await page.mouse.click(...xy);
-          }
-        } else {
-          continue
-        }
-      } else if (action.event === 'tap') {
-        if (action.selector) {
-          try {
-            await page.tap(action.selector);
-          } catch (e) {
-            console.log('>>> Snap Page Tap Error: ', e.message);
-            continue
-          }
-        } else if (action.xy) {
-          const xys = action.xy;
-          if (xys.length < 1) {
-            continue
-          }
-          for (const xy of xys) {
-            await page.mouse.tap(...xy);
-          }
-        } else {
-          continue
-        }
-      } else if (action.event === 'back') {
-        await page.goBack();
-      } else if (action.event === 'drag') {
-        const xys = action.xy;
-        if (xys.length <= 1) {
-          continue
-        }
-        await page.mouse.move(...xys[0]);
-        await page.mouse.down();
-        for (const xy of xys.slice(1)) {
-          await page.mouse.move(...xy);
-        }
-        await page.mouse.up();
-      } else if (action.event === 'init' || action.event === 'wait') {
-
-      } else {
-        continue
-      }
-
-      await page.waitForTimeout(action.time || time);
+      await exec_action(page, action, time);
 
       if (action.snap === 0) {
         continue
       }
 
       final_path = path.join(program.file_path, action.name.toString() || idx.toString());
-
       final_store_path = path.join(global.constant.STATIC_BASE_DIRNAME, final_path + '.' + program.snapType);
       await final_exec_snapshot(program, page, time, final_store_path, selector = action.s);
 
